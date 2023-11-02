@@ -108,3 +108,9 @@ variable "registry_password" {
   description = "The password for the docker registry from which to pull the terraform_enterprise container images."
   type        = string
 }
+
+variable "hostname" {
+  default     = null
+  type        = string
+  description = "Hostname where Terraform Enterprise is accessed (e.g. terraform.example.com)."
+}

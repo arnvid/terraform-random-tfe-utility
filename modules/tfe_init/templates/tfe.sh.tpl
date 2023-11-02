@@ -71,6 +71,16 @@ echo $key_data_b64 | base64 --decode > ${tls_bootstrap_key_pathname}
 chmod 0600 ${tls_bootstrap_key_pathname}
 %{ else ~}
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Skipping TlsBootstrapKey configuration" | tee -a $log_pathname
+echo "[$(date +"%FT%T")] [Terraform Enterprise] Generating Self-Signed TlsBootstrapKey configuration" | tee -a $log_pathname
+mkdir -p $(dirname ${tls_bootstrap_key_pathname})
+cd $(dirname ${tls_bootstrap_key_pathname})
+%{ if hostname != "localhost" ~}
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${hostname}/C=Internal/L=Internal"
+%{ else ~}
+local_hostname=$(ec2metadata --local-hostname)
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${local_hostname}/C=Internal/L=Internal"
+%{ endif ~}
+cp cert.pem bundle.pem
 %{ endif ~}
 ca_certificate_directory="/dev/null"
 %{ if distribution == "rhel" ~}

@@ -8,6 +8,8 @@ locals {
   tls_bootstrap_key_pathname  = "${local.tls_bootstrap_path}/key.pem"
   tls_bootstrap_ca_pathname   = "${local.tls_bootstrap_path}/bundle.pem"
 
+  hostname                    = var.hostname != null ? var.hostname : "localhost"
+
   tfe_user_data = templatefile(
     "${path.module}/templates/tfe.sh.tpl",
     {
