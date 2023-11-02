@@ -25,8 +25,8 @@ locals {
             no_proxy                      = var.no_proxy != null ? join(",", var.no_proxy) : null
             NO_PROXY                      = var.no_proxy != null ? join(",", var.no_proxy) : null
             TFE_HOSTNAME                  = var.hostname
-            TFE_HTTP_PORT                 = var.http_port
-            TFE_HTTPS_PORT                = var.https_port
+            TFE_HTTP_PORT                 = var.http_port != null ? var.http_port : "80"
+            TFE_HTTPS_PORT                = var.https_port != null ? var.https_port : "443"
             TFE_OPERATIONAL_MODE          = var.operational_mode
             TFE_ENCRYPTION_PASSWORD       = random_id.enc_password.hex
             TFE_DISK_CACHE_VOLUME_NAME    = "terraform-enterprise_terraform-enterprise-cache"
