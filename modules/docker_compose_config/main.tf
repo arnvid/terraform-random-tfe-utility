@@ -9,7 +9,7 @@ locals {
   http_port = var.http_port != null ? var.http_port : "80"
   https_port = var.https_port != null ? var.https_port : "443"
 
-  tls_bootstrap_path          = "/etc/tfe/ssl"
+  tls_bootstrap_path          = var.tls_bootstrap_path != null ? var.tls_bootstrap_path : "/etc/ssl/private/terraform-enterprise"
   tls_bootstrap_cert_pathname = "${local.tls_bootstrap_path}/cert.pem"
   tls_bootstrap_key_pathname  = "${local.tls_bootstrap_path}/key.pem"
   tls_bootstrap_ca_pathname   = "${local.tls_bootstrap_path}/bundle.pem"
@@ -78,7 +78,7 @@ locals {
           {
             type   = "bind"
             source = "/etc/tfe/ssl"
-            target = "/etc/ssl/private/terraform-enterprise"
+            target = "${local.tls_bootstrap_path}"
           },
           {
             type   = "volume"
