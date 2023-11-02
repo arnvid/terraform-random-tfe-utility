@@ -78,7 +78,7 @@ cd $(dirname ${tls_bootstrap_key_pathname})
 openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${hostname}/C=Internal/L=Internal"
 %{ else ~}
 local_hostname=$(ec2metadata --local-hostname)
-openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${local_hostname}/C=Internal/L=Internal"
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=$local_hostname/C=Internal/L=Internal"
 %{ endif ~}
 cp cert.pem bundle.pem
 %{ endif ~}
