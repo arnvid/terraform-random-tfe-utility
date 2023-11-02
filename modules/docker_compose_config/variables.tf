@@ -247,7 +247,7 @@ variable "storage_type" {
 
 variable "tfe_image" {
   type        = string
-  description = "The registry path, image name, and image version (e.g. \"quay.io/hashicorp/terraform-enterprise:1234567\")"
+  description = "The registry path, image name, and image version (e.g. \"images.releases.hashicorp.com/hashicorp/terraform-enterprise:v202310-1\")"
 }
 
 variable "tfe_license" {
