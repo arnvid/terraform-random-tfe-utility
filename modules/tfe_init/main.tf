@@ -41,5 +41,7 @@ locals {
 
       registry_username = var.registry_username
       registry_password = var.registry_password
+
+      hostname = local.hostname
   })
 }
