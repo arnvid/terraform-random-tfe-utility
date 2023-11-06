@@ -75,10 +75,10 @@ echo "[$(date +"%FT%T")] [Terraform Enterprise] Generating Self-Signed TlsBootst
 mkdir -p $(dirname ${tls_bootstrap_key_pathname})
 cd $(dirname ${tls_bootstrap_key_pathname})
 %{ if hostname != "localhost" ~}
-openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${hostname}/C=Internal/L=Internal"
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${hostname}/L=Internal"
 %{ else ~}
 local_hostname=$(ec2metadata --local-hostname)
-openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=$local_hostname/C=Internal/L=Internal"
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=$local_hostname/L=Internal"
 %{ endif ~}
 cp cert.pem bundle.pem
 %{ endif ~}
