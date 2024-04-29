@@ -68,7 +68,7 @@ locals {
           "443:${local.https_port}",
           local.active_active ? ["8201:8201"] : []
         ])
-
+        restart = "unless-stopped"
         volumes = flatten([
           {
             type   = "bind"
