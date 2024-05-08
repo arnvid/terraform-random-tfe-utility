@@ -61,11 +61,13 @@ echo "[$(date +"%FT%T")] [Terraform Enterprise] Skipping TlsBootstrapKey configu
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Generating Self-Signed TlsBootstrapCert/TlsBootstrapKey configuration" | tee -a $log_pathname
 mkdir -p $(dirname ${tls_bootstrap_key_pathname})
 cd $(dirname ${tls_bootstrap_key_pathname})
-%{ if ${tfe_hostname} != "localhost" ~}
-openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${hostname}/L=Internal"
+%{ if tfe_hostname != "localhost" ~}
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${tfe_hostname}/L=Internal"
 %{ else ~}
 local_hostname=$(ec2metadata --local-hostname)
 openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=$local_hostname/L=Internal"
+%{ endif ~}
+cp cert.pem bundle.pem
 %{ endif ~}
 
 ca_certificate_directory="/dev/null"
