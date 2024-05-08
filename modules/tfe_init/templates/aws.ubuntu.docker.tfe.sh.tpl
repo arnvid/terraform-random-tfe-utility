@@ -122,6 +122,20 @@ apt-get --assume-yes update
 apt-get --assume-yes install docker-ce docker-ce-cli containerd.io
 apt-get --assume-yes autoremove
 
+%{ if docker_config != null ~}
+echo "[Terraform Enterprise] Defining a custom docker daemon.json file" | tee -a $log_pathname
+docker_directory="/etc/docker"
+echo "[Terraform Enterprise] Creating Docker directory at '$docker_directory'" | tee -a $log_pathname
+mkdir -p $docker_directory
+docker_daemon_pathname="$docker_directory/daemon.json"
+echo "[Terraform Enterprise] Writing Docker daemon to '$docker_daemon_pathname'" | tee -a $log_pathname
+echo "${docker_config}" | base64 --decode > $docker_daemon_pathname
+echo "[Terraform Enterprise] Restarting Docker daemon" | tee -a $log_pathname
+systemctl restart docker.service
+%{ else ~}
+echo "[Terraform Enterprise] Skipping defining a custom docker daemon.json" | tee -a $log_pathname
+%{ endif ~}
+
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Installing TFE FDO" | tee -a $log_pathname
 hostname > /var/log/tfe-fdo.log
 docker login -u="${registry_username}" -p="${registry_password}" ${registry}
