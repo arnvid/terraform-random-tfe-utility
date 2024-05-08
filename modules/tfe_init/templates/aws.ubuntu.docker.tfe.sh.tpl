@@ -56,6 +56,18 @@ chmod 0600 ${tls_bootstrap_key_pathname}
 %{ else ~}
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Skipping TlsBootstrapKey configuration" | tee -a $log_pathname
 %{ endif ~}
+
+%{ if key_secret_id == null && certificate_secret_id == null ~}
+echo "[$(date +"%FT%T")] [Terraform Enterprise] Generating Self-Signed TlsBootstrapCert/TlsBootstrapKey configuration" | tee -a $log_pathname
+mkdir -p $(dirname ${tls_bootstrap_key_pathname})
+cd $(dirname ${tls_bootstrap_key_pathname})
+%{ if ${tfe_hostname} != "localhost" ~}
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=${hostname}/L=Internal"
+%{ else ~}
+local_hostname=$(ec2metadata --local-hostname)
+openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -subj "/CN=$local_hostname/L=Internal"
+%{ endif ~}
+
 ca_certificate_directory="/dev/null"
 ca_certificate_directory=/usr/local/share/ca-certificates/extra
 ca_cert_filepath="$ca_certificate_directory/tfe-ca-certificate.crt"
