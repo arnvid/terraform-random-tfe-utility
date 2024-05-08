@@ -140,3 +140,9 @@ variable "tfe_hostname" {
   type        = string
   description = "Hostname where Terraform Enterprise is accessed (e.g. terraform.example.com). Used for generating TLS certificates."
 }
+
+variable "custom_docker_config_base64" {
+  default     = null
+  type        = string
+  description = "The content of a custom docker daemon.json file to be used by the Terraform Enterprise installation script. This must be formated a Base64 encoded string."
+}

@@ -54,7 +54,7 @@ locals {
       disk_path                   = var.disk_path
       disk_device_name            = var.disk_device_name
       distribution                = var.distribution
-      docker_config               = filebase64("${path.module}/files/daemon.json")
+      docker_config               = coalesce(var.custom_docker_config_base64, filebase64("${path.module}/files/daemon.json"))
       docker_version              = var.distribution == "rhel" ? var.docker_version_rhel : null
       enable_monitoring           = var.enable_monitoring != null ? var.enable_monitoring : false
       tls_bootstrap_cert_pathname = local.tls_bootstrap_cert_pathname
@@ -77,7 +77,7 @@ locals {
       registry_credential = base64encode("${var.registry_username}:${var.registry_password}")
 
       tfe_image = var.tfe_image
-      
+
       tfe_hostname = local.tfe_hostname
   })
 }
