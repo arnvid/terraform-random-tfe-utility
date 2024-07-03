@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -eu pipefail
 
+${retry}
 ${get_base64_secrets}
 ${install_packages}
 %{ if enable_monitoring ~}
@@ -120,9 +121,7 @@ export HOST_IP=$(hostname -i)
 tfe_dir="/etc/tfe"
 mkdir -p $tfe_dir
 
-cat > $tfe_dir/tfe.yaml <<EOF
-${podman_kube_config}
-EOF
+echo ${podman_kube_config} | base64 -d > $tfe_dir/tfe.yaml
 
 cat > $tfe_dir/auth.json <<EOF
 {

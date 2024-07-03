@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -eu pipefail
 
+${retry}
 ${get_base64_secrets}
 ${install_packages}
 %{ if enable_monitoring ~}
@@ -106,9 +107,9 @@ echo \
 	"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
 	https://download.docker.com/linux/ubuntu $(lsb_release --codename --short) stable" \
 	| sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get --assume-yes update
-apt-get --assume-yes install docker-ce docker-ce-cli containerd.io
-apt-get --assume-yes autoremove
+retry 10 apt-get --assume-yes update
+retry 10 apt-get --assume-yes install docker-ce docker-ce-cli containerd.io
+retry 10 apt-get --assume-yes autoremove
 
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Installing TFE FDO" | tee -a $log_pathname
 hostname > /var/log/tfe-fdo.log
@@ -119,8 +120,6 @@ export HOST_IP=$(hostname -i)
 tfe_dir="/etc/tfe"
 mkdir -p $tfe_dir
 
-cat > $tfe_dir/compose.yaml <<EOF
-${docker_compose}
-EOF
+echo ${docker_compose} | base64 -d > $tfe_dir/compose.yaml
 
 docker compose -f /etc/tfe/compose.yaml up -d
