@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -eu pipefail
 
+${retry}
 ${get_base64_secrets}
 ${install_packages}
 %{ if enable_monitoring ~}
@@ -45,6 +46,11 @@ EOF
 http_proxy="${proxy_ip}:${proxy_port}"
 https_proxy="${proxy_ip}:${proxy_port}"
 no_proxy="${no_proxy}"
+EOF
+
+/bin/cat <<EOF >/etc/apt/apt.conf
+Acquire::http::Proxy "http://${proxy_ip}:${proxy_port}";
+Acquire::https::Proxy "http://${proxy_ip}:${proxy_port}";
 EOF
 
 export http_proxy="${proxy_ip}:${proxy_port}"
@@ -195,9 +201,7 @@ export HOST_IP=$(hostname -i)
 tfe_dir="/etc/tfe"
 mkdir -p $tfe_dir
 
-cat > $tfe_dir/compose.yaml <<EOF
-${docker_compose}
-EOF
+echo ${docker_compose} | base64 -d > $tfe_dir/compose.yaml
 
 docker compose -f /etc/tfe/compose.yaml up -d
 

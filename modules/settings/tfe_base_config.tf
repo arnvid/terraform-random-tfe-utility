@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 locals {
+  has_external_storage = var.production_type == "active-active" || var.production_type == "external"
   base_configs = {
     hostname = {
       value = var.hostname
@@ -49,7 +50,7 @@ locals {
     }
 
     enc_password = {
-      value = var.extern_vault_enable != null ? var.extern_vault_enable ? null : random_id.enc_password.hex : random_id.enc_password.hex
+      value = var.extern_vault_enable != null ? var.extern_vault_enable ? null : random_password.enc_password.result : random_password.enc_password.result
     }
 
     extra_no_proxy = {
@@ -93,9 +94,7 @@ locals {
     }
 
     placement = {
-      value = (var.production_type == "external" && var.s3_bucket != null) ? "placement_s3" : (
-        var.production_type == "external" && var.azure_account_name != null) ? "placement_azure" : (
-      var.production_type == "external" && var.gcs_bucket != null) ? "placement_gcs" : null
+      value = (local.has_external_storage && var.s3_bucket != null) ? "placement_s3" : (local.has_external_storage && var.azure_account_name != null) ? "placement_azure" : (local.has_external_storage && var.gcs_bucket != null) ? "placement_gcs" : null
     }
 
     registry_session_encryption_key = {
