@@ -70,10 +70,82 @@ variable "database_user" {
   description = "PostgreSQL user. Required when TFE_OPERATIONAL_MODE is external or active-active."
 }
 
+variable "database_ca_cert_file" {
+  type        = string
+  description = "Path to a file containing the CA certificate for Database TLS connections. Leave blank to not use a CA certificate for Database TLS connections. Defaults to \"\" if no value is given."
+  default     = null
+}
+
+variable "database_client_cert_file" {
+  type        = string
+  description = "Path to a file containing the client certificate for Database TLS connections. Leave blank to not use a client certificate for Database TLS connections. Defaults to \"\" if no value is given."
+  default     = null
+}
+
+variable "database_client_key_file" {
+  type        = string
+  description = "Path to a file containing the client key for Database TLS connections. Leave blank to not use a client key for Database TLS connections. Defaults to \"\" if no value is given."
+  default     = null
+}
+
+variable "database_use_mtls" {
+  type        = bool
+  description = "Whether or not to use mutual TLS to access database. Defaults to false if no value is given."
+  default     = false
+}
+
+variable "database_passwordless_azure_use_msi" {
+  default     = false
+  type        = bool
+  description = "Whether or not to use Azure Managed Service Identity (MSI) to connect to the PostgreSQL database. Defaults to false if no value is given."
+}
+
+variable "database_passwordless_azure_client_id" {
+  default     = ""
+  type        = string
+  description = "Azure Managed Service Identity (MSI) Client ID. If not set, System Assigned Managed Identity will be used."
+}
+
+variable "explorer_database_host" {
+  type        = string
+  default     = null
+  description = "The PostgreSQL server to connect to in the format HOST[:PORT] (e.g. db.example.com or db.example.com:5432). If only HOST is provided then the :PORT defaults to :5432 if no value is given. Required when TFE_OPERATIONAL_MODE is external or active-active."
+}
+
+variable "explorer_database_name" {
+  type        = string
+  default     = null
+  description = "Name of the PostgreSQL database to store application data in. Required when TFE_OPERATIONAL_MODE is external or active-active."
+}
+
+variable "explorer_database_parameters" {
+  type        = string
+  default     = null
+  description = "PostgreSQL server parameters for the connection URI. Used to configure the PostgreSQL connection (e.g. sslmode=require)."
+}
+
+variable "explorer_database_password" {
+  type        = string
+  default     = null
+  description = "PostgreSQL password. Required when TFE_OPERATIONAL_MODE is external or active-active."
+}
+
+variable "explorer_database_user" {
+  type        = string
+  default     = null
+  description = "PostgreSQL user. Required when TFE_OPERATIONAL_MODE is external or active-active."
+}
+
 variable "disk_path" {
   default     = null
   description = "The pathname of the directory in which Terraform Enterprise will store data in Mounted Disk mode. Required when var.operational_mode is 'disk'."
   type        = string
+}
+
+variable "enable_sentinel_mtls" {
+  type        = bool
+  description = "Whether or not to use mutual TLS to access Redis Sentinel. Defaults to false if no value is given."
+  default     = false
 }
 
 variable "http_port" {
@@ -86,6 +158,12 @@ variable "https_port" {
   default     = null
   type        = number
   description = "Port application listens on for HTTPS. Default is 443."
+}
+
+variable "admin_api_https_port" {
+  default     = 8443
+  type        = number
+  description = "Port application listens on for Admin API. Default is 8443."
 }
 
 variable "iact_subnets" {
@@ -209,9 +287,74 @@ variable "redis_use_tls" {
   description = "Whether or not to use TLS to access Redis. Defaults to false if no value is given."
 }
 
+variable "redis_ca_cert_path" {
+  type        = string
+  description = "Path to a file containing the CA certificate for Redis TLS connections. Leave blank to not use a CA certificate for Redis TLS connections. Defaults to \"\" if no value is given."
+  default     = null
+}
+variable "redis_client_cert_path" {
+  type        = string
+  description = "Path to a file containing the client certificate for Redis TLS connections. Leave blank to not use a client certificate for Redis TLS connections. Defaults to \"\" if no value is given."
+  default     = null
+}
+
+variable "redis_client_key_path" {
+  type        = string
+  description = "Path to a file containing the client key for Redis TLS connections. Leave blank to not use a client key for Redis TLS connections. Defaults to \"\" if no value is given."
+  default     = null
+}
+
+variable "redis_use_mtls" {
+  type        = bool
+  description = "Whether or not to use mutual TLS to access Redis. Defaults to false if no value is given."
+  default     = false
+}
+
 variable "redis_user" {
   type        = string
   description = "Redis server user. Leave blank to not use a user when authenticating. Defaults to \"\" if no value is given."
+}
+
+variable "redis_use_sentinel" {
+  type        = bool
+  description = "Will connections to redis use the sentinel protocol?"
+  default     = false
+}
+
+variable "redis_sentinel_hosts" {
+  type        = list(string)
+  description = "A list of sentinel host/port combinations in the form of 'host:port', eg: sentinel-leader.terraform.io:26379"
+  default     = []
+}
+
+variable "redis_sentinel_leader_name" {
+  type        = string
+  description = "The name of the sentinel leader."
+  default     = null
+}
+
+variable "redis_sentinel_user" {
+  type        = string
+  description = "Redis sentinel user. Leave blank to not use a user when authenticating to redis sentinel. Defaults to \"\" if no value is given."
+  default     = null
+}
+
+variable "redis_sentinel_password" {
+  type        = string
+  description = "Redis senitnel password."
+  default     = null
+}
+
+variable "redis_passwordless_azure_use_msi" {
+  default     = false
+  type        = bool
+  description = "Whether or not to use Azure Managed Service Identity (MSI) to connect to the Redis server. Defaults to false if no value is given."
+}
+
+variable "redis_passwordless_azure_client_id" {
+  default     = ""
+  type        = string
+  description = "Azure Managed Service Identity (MSI) Client ID to be used for redis authentication. If not set, System Assigned Managed Identity will be used."
 }
 
 variable "run_pipeline_image" {

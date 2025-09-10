@@ -7,13 +7,14 @@ ${install_packages}
 %{ if enable_monitoring ~}
 ${install_monitoring_agents}
 %{ endif ~}
+${get_unmounted_disk}
 
 log_pathname="/var/log/startup.log"
 
 install_packages $log_pathname
 
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Install JQ" | tee -a $log_pathname
-sudo curl --noproxy '*' -Lo /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+sudo curl --noproxy '*' -Lo /bin/jq https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-$(uname -m | grep -q "arm\|aarch" && echo "arm64" || echo "amd64")
 sudo chmod +x /bin/jq
 
 %{ if proxy_ip != null ~}
@@ -78,7 +79,7 @@ then
 fi
 
 %{ if disk_path != null ~}
-device="/dev/${disk_device_name}"
+device=/dev/$(get_unmounted_disk)
 echo "[Terraform Enterprise] Checking disk at '$device' for EXT4 filesystem" | tee -a $log_pathname
 if lsblk --fs $device | grep ext4
 then

@@ -6,13 +6,16 @@ ${install_packages}
 %{ if enable_monitoring ~}
 ${install_monitoring_agents}
 %{ endif ~}
+%{ if database_azure_msi_auth_enabled ~}
+${azurerm_database_init}
+%{ endif ~}
 
 log_pathname="/var/log/startup.log"
 
 install_packages $log_pathname
 
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Install JQ" | tee -a $log_pathname
-sudo curl --noproxy '*' -Lo /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+sudo curl --noproxy '*' -Lo /bin/jq https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-$(uname -m | grep -q "arm\|aarch" && echo "arm64" || echo "amd64")
 sudo chmod +x /bin/jq
 
 %{ if proxy_ip != null ~}
@@ -111,6 +114,10 @@ echo "UUID=$(lsblk --noheadings --output uuid $device) ${disk_path} ext4 discard
 
 %{ if enable_monitoring ~}
 install_monitoring_agents $log_pathname
+%{ endif ~}
+
+%{ if database_azure_msi_auth_enabled ~}
+azurerm_database_init $log_pathname
 %{ endif ~}
 
 echo "[$(date +"%FT%T")] [Terraform Enterprise] Installing Docker Engine from Repository" | tee -a $log_pathname

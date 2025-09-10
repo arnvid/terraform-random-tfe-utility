@@ -1,6 +1,24 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
+variable "enable_redis_mtls" {
+  default     = false
+  type        = bool
+  description = "Should Redis mTLS be enabled? This requires the redis_ca_certificate_secret_id, redis_client_key_secret_id and redis_client_certificate_secret_id variables to be set."
+}
+
+variable "enable_postgres_mtls" {
+  default     = false
+  type        = bool
+  description = "Should postgres mTLS be enabled? This requires the postgres_ca_certificate_secret_id, postgres_client_key_secret_id and postgres_client_certificate_secret_id variables to be set."
+}
+
+variable "enable_sentinel_mtls" {
+  type        = bool
+  description = "Whether or not to use mutual TLS to access Redis Sentinel. Defaults to false if no value is given."
+  default     = false
+}
+
 variable "ca_certificate_secret_id" {
   default     = null
   type        = string
@@ -11,6 +29,36 @@ variable "certificate_secret_id" {
   default     = null
   type        = string
   description = "A secret ID which contains the Base64 encoded version of a PEM encoded public certificate for the TFE instance(s)."
+}
+
+variable "redis_ca_certificate_secret_id" {
+  default     = null
+  type        = string
+  description = "A secret ID which contains the Base64 encoded version of a PEM encoded public certificate of a certificate authority (CA) to be trusted by the redis instance"
+}
+
+variable "redis_client_certificate_secret_id" {
+  default     = null
+  type        = string
+  description = "A secret ID which contains the Base64 encoded version of a PEM encoded public certificate for redis instance."
+}
+
+variable "postgres_ca_certificate_secret_id" {
+  default     = null
+  type        = string
+  description = "A secret ID which contains the Base64 encoded version of a PEM encoded public certificate of a certificate authority (CA) to be trusted by the database instance"
+}
+
+variable "postgres_client_certificate_secret_id" {
+  default     = null
+  type        = string
+  description = "A secret ID which contains the Base64 encoded version of a PEM encoded public certificate for database instance."
+}
+
+variable "postgres_client_key_secret_id" {
+  default     = null
+  type        = string
+  description = "A secret ID which contains the Base64 encoded version of a PEM encoded private key for the database instance"
 }
 
 variable "cloud" {
@@ -89,7 +137,6 @@ variable "key_secret_id" {
   description = "A secret ID which contains the Base64 encoded version of a PEM encoded private key for the TFE instance(s)."
 }
 
-
 variable "operational_mode" {
   default     = null
   description = "A special string to control the operational mode of Terraform Enterprise. Valid values are: 'external' for External Services mode; 'disk' for Mounted Disk mode; 'active-active' for Active/Active mode."
@@ -110,6 +157,12 @@ variable "proxy_port" {
   default     = null
   type        = string
   description = "Port that the proxy server will use"
+}
+
+variable "redis_client_key_secret_id" {
+  default     = null
+  type        = string
+  description = "A secret ID which contains the Base64 encoded version of a PEM encoded private key for the redis instance"
 }
 
 variable "registry" {
@@ -133,4 +186,35 @@ variable "registry_username" {
 variable "tfe_image" {
   type        = string
   description = "The registry path, image name, and image version (e.g. \"quay.io/hashicorp/terraform-enterprise:1234567\")"
+}
+
+### Database details
+variable "database_host" {
+  default     = null
+  type        = string
+  description = "The PostgreSQL server to connect to. Required when Azure PostgreSQL MSI auth is enabled"
+}
+
+variable "database_name" {
+  default     = null
+  type        = string
+  description = "Name of the PostgreSQL database to store application data in."
+}
+
+variable "admin_database_username" {
+  default     = null
+  type        = string
+  description = "PostgreSQL user."
+}
+
+variable "admin_database_password" {
+  default     = null
+  type        = string
+  description = "PostgreSQL password."
+}
+
+variable "database_passwordless_azure_use_msi" {
+  default     = false
+  type        = bool
+  description = "Whether or not to use Azure Managed Service Identity (MSI) to connect to the PostgreSQL database. Defaults to false if no value is given."
 }

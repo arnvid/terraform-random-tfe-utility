@@ -10,6 +10,7 @@ locals {
     local.redis_configuration,
     local.storage_configuration,
     local.vault_configuration,
+    local.explorer_database_configuration,
     {
       http_proxy                    = var.http_proxy != null ? "http://${var.http_proxy}" : null
       HTTP_PROXY                    = var.http_proxy != null ? "http://${var.http_proxy}" : null
@@ -20,6 +21,7 @@ locals {
       TFE_HOSTNAME                  = var.hostname
       TFE_HTTP_PORT                 = var.http_port
       TFE_HTTPS_PORT                = var.https_port
+      TFE_ADMIN_HTTPS_PORT          = var.admin_api_https_port
       TFE_OPERATIONAL_MODE          = var.operational_mode
       TFE_ENCRYPTION_PASSWORD       = random_password.enc_password.result
       TFE_DISK_CACHE_VOLUME_NAME    = "terraform-enterprise_terraform-enterprise-cache"
@@ -65,6 +67,7 @@ locals {
         ports = flatten([
           "80:${var.http_port}",
           "443:${var.https_port}",
+          "${var.admin_api_https_port}:${var.admin_api_https_port}",
           local.active_active ? ["8201:8201"] : [],
           var.metrics_endpoint_enabled ? [
             "${var.metrics_endpoint_port_http}:9090",
@@ -82,6 +85,16 @@ locals {
             type   = "bind"
             source = "/etc/tfe/ssl"
             target = "/etc/ssl/private/terraform-enterprise"
+          },
+          {
+            type   = "bind"
+            source = "/etc/tfe/ssl/postgres"
+            target = "/etc/ssl/private/terraform-enterprise/postgres"
+          },
+          {
+            type   = "bind"
+            source = "/etc/tfe/ssl/redis"
+            target = "/etc/ssl/private/terraform-enterprise/redis"
           },
           {
             type   = "volume"
@@ -129,6 +142,10 @@ locals {
           {
             containerPort = var.https_port
             hostPort      = 443
+          },
+          {
+            containerPort = var.admin_api_https_port
+            hostPort      = var.admin_api_https_port
           },
           local.active_active ? [{ containerPort = 8201, hostPort = 8201 }] : [],
           var.metrics_endpoint_enabled ? [
